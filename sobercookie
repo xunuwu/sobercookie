@@ -9,13 +9,13 @@ sober_cmd="flatpak run org.vinegarhq.Sober"
 
 help_fn() {
    echo "available options are:"
-   echo "$0 launch [name]"
-   echo "$0 save [name]"
-   echo "$0 load [name]"
-   echo "$0 rm [name]"
-   echo "$0 unload"
-   echo "$0 clean"
-   echo "$0 list"
+   echo "$0 launch [name] -- launches sober using cookie"
+   echo "$0 save [name] -- save current sober cookie"
+   echo "$0 load [name] -- load cookie to sober"
+   echo "$0 rm [name] -- remove saved cookie"
+   echo "$0 unload -- log out of sober without invalidating cookie"
+   echo "$0 clean -- remove all saved cookies"
+   echo "$0 list -- list all saved cookies"
 }
 
 if [[ ! -v 1 ]]; then
