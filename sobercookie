@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+
+# set -x # for debug mode
+set -euo pipefail
+
+sober_dir=~/.var/app/org.vinegarhq.Sober/data/sober/
+cookie_dir=$XDG_DATA_HOME/sober_cookie_manager
+sober_cmd="flatpak run org.vinegarhq.Sober"
+
+help_fn() {
+   echo "available options are:"
+   echo "$0 launch [name]"
+   echo "$0 save [name]"
+   echo "$0 load [name]"
+   echo "$0 rm [name]"
+   echo "$0 unload"
+   echo "$0 clean"
+   echo "$0 list"
+}
+
+if [[ ! -v 1 ]]; then
+   echo "no argument supplied"
+   help_fn
+   exit
+fi
+
+if [[ ! -d "$sober_dir" ]]; then
+   echo "\$sober_dir [$sober_dir] does not exist"
+   exit
+fi
+
+if [[ ! -d "$cookie_dir" ]]; then
+   read -p "cookie directory [$cookie_dir] does not exist, do you wish to create it? [Y/n]: " ans
+   if [[ "$ans" == "y" || "$ans" == "Y" || "$ans" == "" ]]; then
+      echo "creating $cookie_dir"
+      mkdir "$cookie_dir"
+   else
+      echo "cannot continue without cookie directory"
+      exit
+   fi
+fi
+
+
+save_fn() {
+   if [[ ! -v 1 ]]; then
+      echo "please supply the name you want to give to this cookie"
+      exit
+   fi
+   cp "$sober_dir/cookies" "$cookie_dir/$1"
+   echo saved $1
+}
+
+load_fn() {
+   if [[ ! -v 1 ]]; then
+      echo "please supply the name of the cookie you want to load"
+      exit
+   fi
+   cp "$cookie_dir/$1" "$sober_dir/cookies"
+}
+
+list_fn() {
+   ls -1 "$cookie_dir"
+}
+
+rm_fn() {
+   if [[ ! -v 1 ]]; then
+      echo "please supply the name of the cookie you want to remove"
+      exit
+   fi
+   rm "$cookie_dir/$1"
+}
+
+unload_fn() {
+   rm "$sober_dir/cookies"
+   echo successfully unloaded cookie
+}
+
+clean_fn() {
+   read -p "this will remove all saved cookies ($cookie_dir), do you wish to continue? [y/N]: " ans
+   if [[ "$ans" == "y" || "$ans" == "Y" ]]; then
+      rm -rf "$cookie_dir"
+   fi
+}
+
+launch_fn() {
+   if [[ ! -v 1 ]]; then
+      echo "please supply the name of the cookie you want to launch using"
+      exit
+   fi
+
+   saved=/tmp/tmp_saved_sober_cookie
+   cp -f "$sober_dir/cookies" "$saved"
+   trap "cp -f \"$saved\" \"$sober_dir/cookies\" ; rm -f -- $saved" EXIT
+   load_fn $@
+   eval $sober_cmd &>/dev/null &
+   sleep 2
+}
+
+case $1 in
+   "save")   shift && save_fn   $@ ;;
+   "load")   shift && load_fn   $@ ;;
+   "list")   shift && list_fn   $@ ;;
+   "rm")     shift && rm_fn     $@ ;;
+   "unload") shift && unload_fn $@ ;;
+   "clean")  shift && clean_fn  $@ ;;
+   "launch") shift && launch_fn $@ ;;
+   *) help_fn ;;
+esac
