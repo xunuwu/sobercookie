@@ -9,7 +9,7 @@ sober_cmd="flatpak run org.vinegarhq.Sober"
 
 help_fn() {
    echo "available options are:"
-   echo "$0 launch [name] -- launches sober using cookie"
+   echo "$0 launch [name] [--foreground] [arguments] -- launches sober using cookie"
    echo "$0 save [name] -- save current sober cookie"
    echo "$0 load [name] -- load cookie to sober"
    echo "$0 rm [name] -- remove saved cookie"
@@ -78,7 +78,8 @@ unload_fn() {
 clean_fn() {
    read -p "this will remove all saved cookies ($cookie_dir), do you wish to continue? [y/N]: " ans
    if [[ "$ans" == "y" || "$ans" == "Y" ]]; then
-      rm -rf "$cookie_dir"
+      rm -r "$cookie_dir"
+      echo "removed $cookie_dir"
    fi
 }
 
@@ -92,11 +93,21 @@ launch_fn() {
       saved=/tmp/tmp_saved_sober_cookie
       cp -f "$sober_dir/cookies" "$saved"
       trap "cp -f \"$saved\" \"$sober_dir/cookies\" ; rm -f -- $saved" EXIT
+   if [[ $1 == "--foreground" ]]; then
+      shift
+      foreground=
    fi
 
    load_fn $@
    eval $sober_cmd &>/dev/null &
    sleep 2
+
+   if [[ -v foreground ]]; then
+      exec $sober_cmd $@
+   else
+      eval $sober_cmd $@ &>/dev/null &
+   fi
+
 }
 
 case $1 in
