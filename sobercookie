@@ -93,21 +93,22 @@ launch_fn() {
       saved=/tmp/tmp_saved_sober_cookie
       cp -f "$sober_dir/cookies" "$saved"
       trap "cp -f \"$saved\" \"$sober_dir/cookies\" ; rm -f -- $saved" EXIT
+   fi
+
    if [[ $1 == "--foreground" ]]; then
       shift
       foreground=
    fi
 
    load_fn $@
-   eval $sober_cmd &>/dev/null &
-   sleep 2
+   shift
 
    if [[ -v foreground ]]; then
       exec $sober_cmd $@
    else
       eval $sober_cmd $@ &>/dev/null &
+      sleep 2
    fi
-
 }
 
 case $1 in
