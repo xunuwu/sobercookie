@@ -5,4 +5,3 @@ Exec=sobercookie-launcher -- %u
 Terminal=false
 MimeType=x-scheme-handler/roblox;x-scheme-handler/roblox-player
 Categories=Game
-NoDisplay=true
