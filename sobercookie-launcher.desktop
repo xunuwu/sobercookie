@@ -1,4 +1,4 @@
-[DesktopEntry]
+[Desktop Entry]
 Type=Application
 Name=Sobercookie Launcher
 Exec=sobercookie-launcher -- %u
