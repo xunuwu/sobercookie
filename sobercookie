@@ -100,8 +100,12 @@ launch_fn() {
       foreground=
    fi
 
-   load_fn $@
+   if [[ $1 != "default" ]]; then
+      load_fn $@
+   fi
+
    shift
+
 
    if [[ -v foreground ]]; then
       exec $sober_cmd $@
