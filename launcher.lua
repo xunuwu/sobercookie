@@ -2,8 +2,6 @@
 
 local lgi = require("lgi")
 local Gtk = lgi.require("Gtk", "3.0")
--- local GtkLayerShell = lgi.require("GtkLayerShell", "0.1")
--- local posix = require("posix")
 
 local sobercookie_command = "sobercookie" -- uses sobercookie from $PATH
 
@@ -27,9 +25,6 @@ function app:on_startup()
 	local window = Gtk.ApplicationWindow.new(self)
 	window:set_title("Sobercookie Launcher")
 	window:set_default_size(500, 500)
-	-- local scrolled = Gtk.ScrolledWindow.new()
-	-- scrolled:show()
-	-- window:set_default_size(20, 20)
 	local scrolled = Gtk.ScrolledWindow.new()
 	local box = Gtk.Box.new(Gtk.Orientation.VERTICAL, 10)
 
