@@ -59,7 +59,7 @@ load_fn() {
 }
 
 list_fn() {
-   ls -1 "$cookie_dir"
+   ls -1 $([[ -v 1 && $1 == "--show-hidden" ]] && echo "-A") "$cookie_dir"
 }
 
 rm_fn() {
