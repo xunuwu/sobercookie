@@ -30,6 +30,7 @@ function app:on_startup()
 
 	local accounts = get_accounts()
 	if accounts ~= nil then
+		table.insert(accounts, 1, "default")
 		for _, v in ipairs(accounts) do
 			local button = Gtk.Button.new_with_label(v)
 			box:pack_start(button, false, true, 0)
