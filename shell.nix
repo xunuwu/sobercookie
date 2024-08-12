@@ -7,7 +7,6 @@ pkgs.mkShell {
     (with luajitPackages; [
       lua
       lgi
-      luaposix
       #
       stylua
       lua-language-server
