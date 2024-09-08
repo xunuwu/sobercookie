@@ -5,7 +5,9 @@ set -euo pipefail
 
 sober_dir=~/.var/app/org.vinegarhq.Sober/data/sober/
 cookie_dir=$XDG_DATA_HOME/sober_cookie_manager
-sober_cmd="flatpak run org.vinegarhq.Sober"
+sober_id="org.vinegarhq.Sober"
+sober_cmd="flatpak run $sober_id"
+sober_kill_cmd="flatpak kill $sober_id"
 
 help_fn() {
    echo "available options are:"
@@ -89,6 +91,12 @@ launch_fn() {
       exit
    fi
 
+   [[ "$(pidof sober)" ]] && eval $sober_kill_cmd
+
+   while [[ "$(pidof sober)" ]]; do
+      sleep 0.1
+   done
+
    if [[ -e "$sober_dir/cookies" ]]; then
       saved=/tmp/tmp_saved_sober_cookie
       cp -f "$sober_dir/cookies" "$saved"
@@ -105,6 +113,7 @@ launch_fn() {
    fi
 
    shift
+
 
 
    if [[ -v foreground ]]; then
