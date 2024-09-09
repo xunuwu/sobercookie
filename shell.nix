@@ -11,5 +11,9 @@ pkgs.mkShell {
       stylua
       lua-language-server
     ])
+
+    # bash
+    jq
+    libnotify
   ];
 }

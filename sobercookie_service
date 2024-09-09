@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+sober_pid="$1"
+sober_log_dir="$HOME/.var/app/org.vinegarhq.Sober/data/sober/appData/logs/"
+latest_log="$(ls "$sober_log_dir" | tail -n 1)"
+
+trap "echo sobercookie_service exited" EXIT
+
+get_ip() {
+   [[ "$(sudo fuser "$sober_log_dir/$latest_log")" ]] || latest_log="$(ls "$sober_log_dir" | tail -n 1)"
+   grep 'Connection accepted from' "$sober_log_dir/$latest_log" | tail -n 1
+}
+
+cached_ip=
+while [[ "$(pidof sober)" == "$sober_pid" ]]; do
+   new_ip=$(get_ip || sleep 3 && continue)
+   [[ "$new_ip" == "$cached_ip" ]] && sleep 3 && continue
+   cached_ip=$new_ip
+   ip_addr="$( echo "$new_ip" | sed 's/|.*$//g' | sed 's/.*from //g' )"
+   ip_location="$( curl ip-api.com/json/$ip_addr 2>/dev/null | jq -r '.query,.city,.country' )"
+   notify-send -t 4000 "$(printf 'Connected to roblox server\n%s\n' "$ip_location")"
+   sleep 3
+done
