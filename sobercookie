@@ -114,18 +114,12 @@ launch_fn() {
 
    shift
 
-   start_service &
    if [[ -v foreground ]]; then
       exec $sober_cmd $@
    else
       eval $sober_cmd $@ &>/dev/null &
       sleep 2
    fi
-}
-
-start_service() {
-   sleep 3
-   sobercookie_service "$(pidof sober)"
 }
 
 case $1 in
