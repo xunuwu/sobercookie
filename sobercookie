@@ -13,7 +13,7 @@ sober_kill_cmd="flatpak kill $sober_id"
 
 help_fn() {
    echo "available options are:"
-   echo "launch [name] [--foreground] [arguments] -- launches sober using cookie"
+   echo "launch [name] [--foreground] [sober arguments] -- launches sober using cookie"
    echo "save [name] -- save current sober cookie"
    echo "load [name] -- load cookie to sober"
    echo "rm [name] -- remove saved cookie"
@@ -108,7 +108,7 @@ launch_fn() {
    if [[ -e "$sober_dir/cookies" ]]; then
       saved=/tmp/tmp_saved_sober_cookie
       cp -f "$sober_dir/cookies" "$saved"
-      trap "cp -f \"$saved\" \"$sober_dir/cookies\" ; rm -f -- $saved" EXIT
+      trap "mv -f \"$saved\" \"$sober_dir/cookies\"" EXIT
    fi
 
    if [[ $1 == "--foreground" ]]; then
