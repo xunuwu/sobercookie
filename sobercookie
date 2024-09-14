@@ -9,7 +9,6 @@ cookie_dir="$sobercookie_dir/cookies"
 data_dir="$sobercookie_dir/data"
 sober_id="org.vinegarhq.Sober"
 sober_cmd="flatpak run $sober_id"
-sober_kill_cmd="flatpak kill $sober_id"
 
 help_fn() {
    echo "available options are:"
