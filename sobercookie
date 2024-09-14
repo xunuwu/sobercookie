@@ -4,7 +4,9 @@
 set -euo pipefail
 
 sober_dir=~/.var/app/org.vinegarhq.Sober/data/sober/
-cookie_dir=$XDG_DATA_HOME/sober_cookie_manager
+sobercookie_dir="$XDG_DATA_HOME/sobercookie"
+cookie_dir="$sobercookie_dir/cookies"
+data_dir="$sobercookie_dir/data"
 sober_id="org.vinegarhq.Sober"
 sober_cmd="flatpak run $sober_id"
 sober_kill_cmd="flatpak kill $sober_id"
@@ -31,16 +33,18 @@ if [[ ! -d "$sober_dir" ]]; then
    exit
 fi
 
-if [[ ! -d "$cookie_dir" ]]; then
-   read -p "cookie directory [$cookie_dir] does not exist, do you wish to create it? [Y/n]: " ans
-   if [[ "$ans" == "y" || "$ans" == "Y" || "$ans" == "" ]]; then
-      echo "creating $cookie_dir"
-      mkdir "$cookie_dir"
-   else
-      echo "cannot continue without cookie directory"
-      exit
+for dir in "$cookie_dir" "$data_dir"; do
+   if [[ ! -d "$dir" ]]; then
+      read -p "[$dir] does not exist, do you wish to create it? [Y/n]: " ans
+      if [[ "$ans" == "y" || "$ans" == "Y" || "$ans" == "" ]]; then
+         echo "creating $dir"
+         mkdir -p "$dir"
+      else
+         echo "cannot continue without cookie directory"
+         exit
+      fi
    fi
-fi
+done
 
 
 save_fn() {
@@ -91,11 +95,15 @@ launch_fn() {
       exit
    fi
 
-   [[ "$(pidof sober)" ]] && eval $sober_kill_cmd
-
-   while [[ "$(pidof sober)" ]]; do
-      sleep 0.1
-   done
+    # Patching out the multi instance check :P
+   [[ ! -f "$data_dir/latest" ]] && touch "$data_dir/latest"
+   current_ver=$(flatpak info "$sober_id" -c)
+   if [[ "$current_ver" != "$(cat "$data_dir/latest")" ]]; then
+      echo "$current_ver" > "$data_dir/latest"
+      perl -i -pne \
+         's/\xe8\xb5\x90\xfb\xff\x89\xc5/\xbd\x01\x00\x00\x00\x90\x90/' \
+         "$XDG_DATA_HOME/flatpak/app/$sober_id/current/active/files/bin/sober"
+   fi
 
    if [[ -e "$sober_dir/cookies" ]]; then
       saved=/tmp/tmp_saved_sober_cookie
