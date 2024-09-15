@@ -100,7 +100,7 @@ launch_fn() {
    if [[ "$current_ver" != "$(cat "$data_dir/latest")" ]]; then
       echo "$current_ver" > "$data_dir/latest"
       perl -i -pne \
-         's/\xe8\xb5\x90\xfb\xff\x89\xc5/\xbd\x01\x00\x00\x00\x90\x90/' \
+         's/\xe8\x46\x81\xfb\xff\x89\xc5/\xbd\x01\x00\x00\x00\x90\x90/' \
          "$XDG_DATA_HOME/flatpak/app/$sober_id/current/active/files/bin/sober"
    fi
 
