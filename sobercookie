@@ -125,9 +125,9 @@ launch_fn() {
    [[ $config_launch_mode == "kill" ]] && { flatpak kill "$sober_id" || :; }
 
    if [[ -v foreground ]]; then
-      "${sober_cmd[@]}" "$@"
+      "${sober_cmd[@]} $@"
    else
-      "${sober_cmd[@]}" "$@" &>/dev/null &
+      "${sober_cmd[@]} $@" &>/dev/null &
    fi
 }
 
