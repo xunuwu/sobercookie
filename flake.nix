@@ -35,6 +35,7 @@
           coreutils
           flatpak
           inputs.self.packages.${pkgs.system}.sobercookie-noflock
+          bubblewrap
         ];
       in
         pkgs.symlinkJoin {
@@ -93,6 +94,7 @@
         src = ./sobercookie-noflock;
         buildInputs = with pkgs; [
           libseccomp
+          bubblewrap
         ];
         installPhase = ''
           mkdir -p $out/bin
