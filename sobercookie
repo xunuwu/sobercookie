@@ -109,9 +109,7 @@ launch_fn() {
    fi
 
    if [[ $1 != "default" ]]; then
-      tmpfile=$(mktemp)
-      cp -f "$cookie_dir/$1" "$tmpfile"
-      sober_cmd=( "bwrap --dev-bind / / --bind $tmpfile $sober_dir/cookies" "${sober_cmd[*]}" )
+      sober_cmd=( "bwrap --dev-bind / / --bind $cookie_dir/$1 $sober_dir/cookies" "${sober_cmd[*]}" )
    fi
 
    [[ $config_launch_mode == "multi" ]] && sober_cmd=( "sobercookie-noflock" "${sober_cmd[*]}" )
