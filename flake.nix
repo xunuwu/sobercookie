@@ -9,6 +9,8 @@
         gtk3
         gtk-layer-shell
 
+        bubblewrap
+
         (with luajitPackages; [
           lua
           lgi
@@ -34,7 +36,6 @@
         dependencies = with pkgs; [
           coreutils
           flatpak
-          inputs.self.packages.${pkgs.system}.sobercookie-noflock
           bubblewrap
         ];
       in
@@ -85,20 +86,6 @@
             --prefix LUA_CPATH : "./?.so;${lgi}/lib/lua/5.1/?.so;${luajit}/lib/lua/5.1/?.so;${luajit}/lib/lua/5.1/loadall.so"
             --set PATH ${pkgs.lib.makeBinPath [inputs.self.packages.${pkgs.system}.sobercookie-cli]}
           )
-        '';
-      };
-
-      sobercookie-noflock = pkgs.stdenv.mkDerivation {
-        name = "sobercookie-noflock";
-        version = "0.1";
-        src = ./sobercookie-noflock;
-        buildInputs = with pkgs; [
-          libseccomp
-          bubblewrap
-        ];
-        installPhase = ''
-          mkdir -p $out/bin
-          cp sobercookie-noflock $out/bin
         '';
       };
     };

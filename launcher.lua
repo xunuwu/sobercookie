@@ -30,7 +30,7 @@ local function account_buttons(show_hidden)
 			local button = Gtk.Button.new_with_label(v)
 			box:pack_start(button, false, true, 0)
 			function button:on_clicked()
-				os.execute(sobercookie_command .. " launch " .. v .. " " .. table.concat(arg, " "))
+				io.popen(sobercookie_command .. " launch " .. v .. " " .. table.concat(arg, " "))
 				os.exit()
 			end
 		end

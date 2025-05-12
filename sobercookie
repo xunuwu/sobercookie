@@ -3,20 +3,16 @@
 #set -x # for debug mode
 set -euo pipefail
 
-sober_dir=~/.var/app/org.vinegarhq.Sober/data/sober/
+base_sober_dir=~/.var/app/org.vinegarhq.Sober/
+sober_dir=$base_sober_dir/data/sober/
 sobercookie_dir="$XDG_DATA_HOME/sobercookie"
 cookie_dir="$sobercookie_dir/cookies"
 data_dir="$sobercookie_dir/data"
 config_file="$XDG_CONFIG_HOME/sobercookie.conf"
-sober_id="org.vinegarhq.Sober"
-sober_cmd=(flatpak run "$sober_id")
-
-## config options (change in your config file!)
-config_launch_mode="multi" # [multi,kill,standard]
 
 help_fn() {
    echo "available options are:"
-   echo "launch [--foreground] [name] [sober arguments] -- launches sober using cookie"
+   echo "launch [name] [sober arguments] -- launches sober using cookie"
    echo "save [name] -- save current sober cookie"
    echo "load [name] -- load cookie to sober"
    echo "rm [name] -- remove saved cookie"
@@ -103,29 +99,18 @@ launch_fn() {
       exit
    fi
 
-   if [[ $1 == "--foreground" ]]; then
-      shift
-      foreground=
-   fi
+   SANDBOX_DIR=$(mktemp -d -t sober-instance-XXXXXX)
+   trap 'rm -rf "$SANDBOX_DIR"' EXIT
+   mkdir -p "$SANDBOX_DIR"
+   cp -r "$base_sober_dir"/* "$SANDBOX_DIR"
 
    if [[ $1 != "default" ]]; then
-      sober_cmd=( "bwrap --dev-bind / / --bind $cookie_dir/$1 $sober_dir/cookies" "${sober_cmd[*]}" )
-   fi
-
-   [[ $config_launch_mode == "multi" ]] && sober_cmd=( "sobercookie-noflock" "${sober_cmd[*]}" )
-   [[ $config_launch_mode == "kill" ]] && { flatpak kill "$sober_id" || :; }
-
-   if [[ $1 != "default" ]]; then
-      COOKIE="$1"
+      cp "$cookie_dir/$1" "$SANDBOX_DIR/data/sober/cookies"
    fi
 
    shift
 
-   if [[ -v foreground ]]; then
-      "${sober_cmd[@]} $@"
-   else
-      "${sober_cmd[@]} $@" &>/dev/null &
-   fi
+   bwrap --dev-bind / / --bind $SANDBOX_DIR $base_sober_dir flatpak run org.vinegarhq.Sober $@
 }
 
 case $1 in
