@@ -99,18 +99,20 @@ launch_fn() {
       exit
    fi
 
-   SANDBOX_DIR=$(mktemp -d -t sober-instance-XXXXXX)
-   trap 'rm -rf "$SANDBOX_DIR"' EXIT
-   mkdir -p "$SANDBOX_DIR"
-   cp -r "$base_sober_dir"/* "$SANDBOX_DIR"
+   APKCOPY=$(mktemp -t sober-apkcopy-XXXXXX)
+   trap 'rm -f "$APKCOPY"' EXIT
+
+   cp "$sober_dir/assets/base.apk" "$APKCOPY"
 
    if [[ $1 != "default" ]]; then
-      cp "$cookie_dir/$1" "$SANDBOX_DIR/data/sober/cookies"
+      selected_cookie="$cookie_dir/$1"
+   else
+      selected_cookie="$sober_dir/cookies"
    fi
 
    shift
 
-   bwrap --dev-bind / / --bind $SANDBOX_DIR $base_sober_dir flatpak run org.vinegarhq.Sober $@
+   bwrap --dev-bind / / --bind "$APKCOPY" "$sober_dir/assets/base.apk" --bind "$selected_cookie" "$sober_dir/cookies" flatpak run org.vinegarhq.Sober $@
 }
 
 case $1 in
